@@ -1,0 +1,12 @@
+﻿{
+  "Author": "Pohky",
+  "Name": "ContextPlugin",
+  "InternalName": "ContextPlugin",
+  "Punchline": "ContextPlugin Punchline",
+  "Description": "ContextPlugin Description",
+  "RepoUrl": "https://github.com/Pohky/ContextPlugin",
+  "ApplicableVersion": "any",
+  "AssemblyVersion": "1.0.0.0",
+  "DalamudApiLevel": 6,
+  "LoadPriority": 0
+}
