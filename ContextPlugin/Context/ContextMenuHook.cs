@@ -54,16 +54,15 @@ internal unsafe class ContextMenuHook : IDisposable {
     }
 
     private int* ReceiveEvent(void* self, int* a2, AtkValue* eventParams, nint a4, long param) {
-        *a2 = 2;
-        
         //check if a regular custom item was clicked
         var item = m_CurrentOpenArgs?.CustomMenuItems.FirstOrDefault(m => m.Id == param);
         if (item == null) {
             //check if a submenu custom item was clicked
             item = m_CurrentSubMenuOpenArgs?.CustomMenuItems.FirstOrDefault(m => m.Id == param);
             if (item is { } subItem) {
-                //if the item is inside a custom submenu call it's handler
+                //if the item is inside a custom submenu call it's handler and return
                 subItem.Handler?.Invoke();
+                *a2 = 2;
                 return a2;
             }
         }
@@ -83,6 +82,7 @@ internal unsafe class ContextMenuHook : IDisposable {
             item?.Handler?.Invoke();
         }
 
+        *a2 = 2;
         return a2;
     }
 }

@@ -1,6 +1,5 @@
 ﻿using System;
 using Dalamud.Hooking;
-using Dalamud.Logging;
 using FFXIVClientStructs.FFXIV.Client.UI.Agent;
 using FFXIVClientStructs.FFXIV.Component.GUI;
 
@@ -35,12 +34,12 @@ internal unsafe class InventoryContextMenuHook : IDisposable {
             ctx->AddMenuItem(param.String, m_InventoryEventInterface.Pointer, i - agent->ContexItemStartIndex);
         }
 
+        //update owner id and open regular context menu
         agent->OwnerAddonId = addonId;
         ctx->OpenContextMenuForAddon(addonId);
     }
 
     private int* InventoryReceiveEvent(void* self, int* a2, AtkValue* eventparams, nint a4, long param) {
-        PluginLog.LogInformation($"InventoryEvent: Idx: {eventparams[1].Int} Param: {param}");
         // pass inventorycontext events to the the original handler with the original index
         var agent = AgentInventoryContext.Instance();
         var handler = (delegate* unmanaged<void*, int*, void*, nint, long, int*>)agent->AgentInterface.AtkEventInterface.vtbl[0];

@@ -1,7 +1,6 @@
 ﻿using ContextPlugin.Context;
 using Dalamud.Logging;
 using Dalamud.Plugin;
-using SigScanner = Dalamud.Game.SigScanner;
 
 namespace ContextPlugin.Plugin; 
 
