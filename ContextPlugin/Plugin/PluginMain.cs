@@ -1,8 +1,6 @@
 ﻿using ContextPlugin.Context;
-using Dalamud.Game;
 using Dalamud.Logging;
 using Dalamud.Plugin;
-using FFXIVClientStructs;
 using SigScanner = Dalamud.Game.SigScanner;
 
 namespace ContextPlugin.Plugin; 
@@ -10,19 +8,10 @@ namespace ContextPlugin.Plugin;
 public sealed class PluginMain : IDalamudPlugin {
     public string Name => "ContextPlugin";
 
-    public readonly DalamudPluginInterface PluginInterface;
-    public readonly Framework Framework;
-    public readonly PluginConfig Config;
     public readonly ContextMenu Context;
-    private readonly PluginGui m_Gui;
 
-    public PluginMain(DalamudPluginInterface pluginInterface, Framework framework, SigScanner scanner) {
-        Resolver.Initialize(scanner.SearchBase);
-        PluginInterface = pluginInterface;
-        Framework = framework;
-        Config = pluginInterface.GetPluginConfig() as PluginConfig ?? new PluginConfig();
+    public PluginMain() {
         Context = new ContextMenu();
-        m_Gui = new PluginGui(this);
 
         Context.MenuOpen += ContextOnMenuOpen;
         Context.InventoryMenuOpen += ContextOnInventoryMenuOpen;
@@ -46,8 +35,6 @@ public sealed class PluginMain : IDalamudPlugin {
     public void Dispose() {
         Context.InventoryMenuOpen -= ContextOnInventoryMenuOpen;
         Context.MenuOpen -= ContextOnMenuOpen;
-        PluginInterface.SavePluginConfig(Config);
-        m_Gui.Dispose();
         Context.Dispose();
     }
 }
