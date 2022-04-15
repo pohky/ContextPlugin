@@ -16,7 +16,8 @@ public sealed class PluginMain : IDalamudPlugin {
         Context.InventoryMenuOpen += ContextOnInventoryMenuOpen;
     }
 
-    private void ContextOnInventoryMenuOpen(ContextMenuOpenArgs args) {
+    private void ContextOnInventoryMenuOpen(InventoryContextMenuOpenArgs args) {
+        args.AddItem($"Some Menu for {args.ItemId} in {args.InventoryId}", () => PluginLog.LogInformation("Bonk"));
         args.AddItem("Some Inventory Item", () => PluginLog.LogInformation("Whatever"));
         args.AddSubMenu("Some Submenu", openArgs => {
             openArgs.AddItem("Fart", () => PluginLog.LogInformation("Pfffft"));

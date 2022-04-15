@@ -17,7 +17,7 @@ internal unsafe class ContextMenuHook : IDisposable {
     private SubContextMenuOpenArgs? m_CurrentSubMenuOpenArgs;
 
     public event ContextMenuOpenEventDelegate? ContextMenuOpen;
-    public event ContextMenuOpenEventDelegate? InventoryContextMenuOpen;
+    public event InventoryContextMenuOpenEventDelegate? InventoryContextMenuOpen;
 
     public ContextMenuHook() {
         m_ContextEventInterface = new CustomAtkEventInterface(ReceiveEvent);
@@ -38,17 +38,25 @@ internal unsafe class ContextMenuHook : IDisposable {
             m_OpenContextHook.Original(agent, setowner, closeexisting);
             return;
         }
-
-        var isInventoryContext = agent->OwnerAddon == AgentInventoryContext.Instance()->OwnerAddonId;
-
-        m_CurrentOpenArgs = new ContextMenuOpenArgs();
-        if (isInventoryContext) 
-            InventoryContextMenuOpen?.Invoke(m_CurrentOpenArgs);
-        else 
+        
+        var inv = AgentInventoryContext.Instance();
+        var isInventoryContext = m_InventoryContextMenuHook.IsOpen && inv->TargetInventorySlot != null;
+        
+        if (isInventoryContext) {
+            var item = inv->TargetInventorySlot;
+            var itemId = item->ItemID;
+            var inventoryId = (uint)item->Container;
+            m_CurrentOpenArgs = new InventoryContextMenuOpenArgs(itemId, inventoryId);
+            InventoryContextMenuOpen?.Invoke((InventoryContextMenuOpenArgs)m_CurrentOpenArgs);
+        } else {
+            m_CurrentOpenArgs = new ContextMenuOpenArgs();
             ContextMenuOpen?.Invoke(m_CurrentOpenArgs);
+        }
 
         foreach (var item in m_CurrentOpenArgs.CustomMenuItems)
             agent->AddMenuItem($"[C] {item.Name}", m_ContextEventInterface.Pointer, item.Id, item.IsDisabled, item is CustomSubContextMenuItem);
+
+        m_InventoryContextMenuHook.IsOpen = false;
 
         m_OpenContextHook.Original(agent, setowner, closeexisting);
     }
@@ -77,6 +85,11 @@ internal unsafe class ContextMenuHook : IDisposable {
             ctx->OpenSubMenu();
             foreach (var subItem in m_CurrentSubMenuOpenArgs.CustomMenuItems)
                 ctx->AddMenuItem(subItem.Name, m_ContextEventInterface.Pointer, subItem.Id, subItem.IsDisabled);
+
+            //set inventory context to open so it doesn't get lost when the submenu is opened and closed
+            if (m_CurrentOpenArgs is InventoryContextMenuOpenArgs)
+                m_InventoryContextMenuHook.IsOpen = true;
+
         } else {
             //if it's a regular custom item just call the click handler
             item?.Handler?.Invoke();

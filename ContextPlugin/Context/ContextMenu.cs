@@ -6,7 +6,7 @@ public sealed class ContextMenu : IDisposable {
     private readonly ContextMenuHook m_ContextMenuHook;
     
     public event ContextMenuOpenEventDelegate? MenuOpen;
-    public event ContextMenuOpenEventDelegate? InventoryMenuOpen;
+    public event InventoryContextMenuOpenEventDelegate? InventoryMenuOpen;
 
     public ContextMenu() {
         m_ContextMenuHook = new ContextMenuHook();
@@ -14,7 +14,7 @@ public sealed class ContextMenu : IDisposable {
         m_ContextMenuHook.InventoryContextMenuOpen += OnInventoryMenuOpen;
     }
 
-    private void OnInventoryMenuOpen(ContextMenuOpenArgs args) {
+    private void OnInventoryMenuOpen(InventoryContextMenuOpenArgs args) {
         InventoryMenuOpen?.Invoke(args);
     }
 

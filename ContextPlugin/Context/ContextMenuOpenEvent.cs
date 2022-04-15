@@ -4,6 +4,7 @@ using System.Collections.Generic;
 namespace ContextPlugin.Context;
 
 public delegate void ContextMenuOpenEventDelegate(ContextMenuOpenArgs args);
+public delegate void InventoryContextMenuOpenEventDelegate(InventoryContextMenuOpenArgs args);
 
 public class ContextMenuOpenArgs {
     private long m_InternalMenuItemId;
@@ -32,6 +33,16 @@ public class ContextMenuOpenArgs {
     public void InsertSubMenu(int index, string name, Action<SubContextMenuOpenArgs> handler, bool disabled = false) {
         var item = CustomSubContextMenuItem.Create(name, m_InternalMenuItemId++, handler, disabled);
         CustomMenuItems.Insert(index, item);
+    }
+}
+
+public class InventoryContextMenuOpenArgs : ContextMenuOpenArgs {
+    public uint ItemId { get; }
+    public uint InventoryId { get; }
+
+    internal InventoryContextMenuOpenArgs(uint itemId, uint inventoryId, long baseId = 1000) : base(baseId) {
+        ItemId = itemId;
+        InventoryId = inventoryId;
     }
 }
 

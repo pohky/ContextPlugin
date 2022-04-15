@@ -11,6 +11,9 @@ internal unsafe class InventoryContextMenuHook : IDisposable {
     private readonly CustomAtkEventInterface m_InventoryEventInterface;
     private readonly Hook<OpenInventoryContextDelegate> m_OpenInventoryContextHook;
 
+    // hacky field to keep track of it being open across both ContextMenuHook and InventoryContextMenuHook
+    internal bool IsOpen;
+
     public InventoryContextMenuHook() {
         m_InventoryEventInterface = new CustomAtkEventInterface(InventoryReceiveEvent);
         m_OpenInventoryContextHook = new Hook<OpenInventoryContextDelegate>((nint)AgentInventoryContext.fpOpenForItemSlot, OpenInventoryContextDetour);
@@ -33,6 +36,9 @@ internal unsafe class InventoryContextMenuHook : IDisposable {
             var param = agent->EventParamsSpan[i];
             ctx->AddMenuItem(param.String, m_InventoryEventInterface.Pointer, i - agent->ContexItemStartIndex);
         }
+
+        agent->AgentInterface.AddonId = 0;
+        IsOpen = true;
 
         //update owner id and open regular context menu
         agent->OwnerAddonId = addonId;
